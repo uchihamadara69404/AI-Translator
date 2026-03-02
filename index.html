@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tarjama · ترجمة</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0a0a0f;
+      color: #e8e4d9;
+      font-family: Georgia, serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 18px 32px;
+      border-bottom: 1px solid rgba(180,140,60,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,10,15,0.9);
+    }
+
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-icon {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: linear-gradient(135deg, #b48c3c, #8b6914);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: bold; color: #fff;
+    }
+    .logo-title { font-size: 18px; font-weight: 600; color: #e8e4d9; }
+    .logo-sub { font-size: 11px; color: #6b7280; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .badge {
+      padding: 4px 10px; border-radius: 4px; font-size: 11px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .badge-gold { background: rgba(180,140,60,0.1); border: 1px solid rgba(180,140,60,0.3); color: #b48c3c; }
+    .badge-green { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: #10b981; }
+
+    .toolbar {
+      padding: 14px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      background: rgba(15,15,22,0.9);
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px; border-radius: 6px; font-size: 13px;
+      font-weight: 600; cursor: pointer; border: none;
+      letter-spacing: 0.04em; transition: all 0.2s;
+    }
+    #uploadBtn {
+      background: linear-gradient(135deg, #b48c3c, #8b6914);
+      color: #fff; box-shadow: 0 2px 12px rgba(180,140,60,0.3);
+    }
+    #translateBtn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1); color: #4b5563;
+    }
+    #translateBtn.active {
+      background: linear-gradient(135deg, #1e3a6e, #2d5299);
+      border-color: #2d5299; color: #fff;
+    }
+    #verifyBtn { display: none; padding: 8px 16px; font-size: 12px; margin-left: auto; }
+
+    .filename {
+      font-size: 12px; color: #6b7280;
+      background: rgba(255,255,255,0.04);
+      padding: 6px 12px; border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .status {
+      font-size: 12px; color: #b48c3c;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(180,140,60,0.3);
+      border-top-color: #b48c3c;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .report-panel {
+      display: none;
+      padding: 20px 32px;
+      border-bottom: 1px solid rgba(180,140,60,0.2);
+      background: rgba(15,20,30,0.97);
+    }
+    .report-title {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .report-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .report-body {
+      font-family: 'Courier New', monospace; font-size: 12.5px;
+      line-height: 1.8; color: #c9c5ba; white-space: pre-wrap;
+      background: rgba(255,255,255,0.02); padding: 18px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      max-height: 380px; overflow-y: auto;
+    }
+
+    .panels {
+      flex: 1; display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 0;
+    }
+
+    .drop-zone {
+      grid-column: 1 / -1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: calc(100vh - 120px);
+      border: 2px dashed rgba(255,255,255,0.08);
+      margin: 32px; border-radius: 16px;
+      cursor: pointer; gap: 18px; transition: all 0.3s;
+    }
+    .drop-zone:hover, .drop-zone.drag { border-color: #b48c3c; background: rgba(180,140,60,0.04); }
+    .drop-icon { font-size: 48px; }
+    .drop-title { font-size: 20px; font-weight: 600; }
+    .drop-sub { font-size: 13px; color: #4b5563; line-height: 1.8; text-align: center; }
+
+    .panel { display: flex; flex-direction: column; min-height: calc(100vh - 120px); }
+    .panel:first-child { border-right: 1px solid rgba(255,255,255,0.06); }
+
+    .panel-header {
+      padding: 12px 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.02);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .panel-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #6b7280; }
+    .panel-lang {
+      font-size: 11px; padding: 2px 8px; border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.04); color: #4b5563;
+    }
+    .panel-lang.ar { background: rgba(180,140,60,0.08); border-color: rgba(180,140,60,0.2); color: #b48c3c; }
+    .word-count { margin-left: auto; font-size: 11px; color: #374151; }
+
+    .panel-body {
+      flex: 1; overflow-y: auto; padding: 22px;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
+    }
+    pre {
+      font-family: Georgia, serif; font-size: 14px;
+      line-height: 1.9; color: #c9c5ba; white-space: pre-wrap;
+      word-break: break-word; margin: 0;
+    }
+    pre.arabic { direction: rtl; text-align: right; line-height: 2.1; }
+
+    .placeholder {
+      height: 100%; display: flex; align-items: center;
+      justify-content: center; color: #374151; font-size: 14px; text-align: center;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">ت</div>
+    <div>
+      <div class="logo-title">Tarjama · ترجمة</div>
+      <div class="logo-sub">Official Document Translation Suite</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <span class="badge badge-gold">EN → AR</span>
+    <span class="badge badge-green">Dual Verification</span>
+  </div>
+</header>
+
+<div class="toolbar">
+  <input type="file" id="fileInput" accept=".pdf" style="display:none" />
+  <button id="uploadBtn" onclick="document.getElementById('fileInput').click()">↑ Upload PDF</button>
+  <button id="translateBtn" onclick="runTranslate()">⟳ Translate & Verify</button>
+  <span class="filename" id="filename" style="display:none"></span>
+  <div class="status" id="status" style="display:none">
+    <div class="spinner"></div>
+    <span id="statusMsg"></span>
+  </div>
+  <button class="badge" id="verifyBtn" onclick="toggleReport()"></button>
+</div>
+
+<div class="report-panel" id="reportPanel">
+  <div class="report-title">
+    <div class="report-dot" id="reportDot"></div>
+    <span id="reportTitle">Verification Audit Report</span>
+  </div>
+  <pre class="report-body" id="reportBody"></pre>
+</div>
+
+<div class="panels" id="panels">
+  <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+    <div class="drop-icon">📄</div>
+    <div class="drop-title">Upload a PDF to begin</div>
+    <div class="drop-sub">Drag & drop or click to browse<br>English → Arabic with dual-layer verification</div>
+  </div>
+</div>
+
+<script>
+  let originalText = "";
+  let translatedText = "";
+
+  const fileInput = document.getElementById("fileInput");
+  const panels = document.getElementById("panels");
+  const dropZone = document.getElementById("dropZone");
+
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) handleUpload(fileInput.files[0]);
+  });
+
+  dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("drag"); });
+  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag"));
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault(); dropZone.classList.remove("drag");
+    if (e.dataTransfer.files[0]) handleUpload(e.dataTransfer.files[0]);
+  });
+
+  async function handleUpload(file) {
+    showStatus("Extracting PDF...");
+    document.getElementById("filename").textContent = "📄 " + file.name;
+    document.getElementById("filename").style.display = "inline";
+
+    const form = new FormData();
+    form.append("pdf", file);
+
+    try {
+      const res = await fetch("/upload", { method: "POST", body: form });
+      const data = await res.json();
+      originalText = data.text;
+      renderPanels();
+      hideStatus();
+      activateTranslateBtn();
+    } catch (e) {
+      hideStatus();
+      alert("Failed to extract PDF: " + e.message);
+    }
+  }
+
+  async function runTranslate() {
+    if (!originalText) return;
+    translatedText = "";
+    document.getElementById("verifyBtn").style.display = "none";
+    document.getElementById("reportPanel").style.display = "none";
+    renderPanels();
+
+    showStatus("Translating to Arabic...");
+    try {
+      const res = await fetch("/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: originalText })
+      });
+      const data = await res.json();
+      translatedText = data.translation;
+      renderPanels();
+
+      showStatus("Running verification audit...");
+      const res2 = await fetch("/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ original: originalText, translation: translatedText })
+      });
+      const data2 = await res2.json();
+      showReport(data2.report);
+      hideStatus();
+    } catch (e) {
+      hideStatus();
+      alert("Error: " + e.message);
+    }
+  }
+
+  function renderPanels() {
+    panels.innerHTML = `
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Original</span>
+          <span class="panel-lang">English</span>
+          <span class="word-count">${originalText.split(/\s+/).length} words</span>
+        </div>
+        <div class="panel-body"><pre>${escapeHtml(originalText)}</pre></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Translation</span>
+          <span class="panel-lang ar">العربية</span>
+        </div>
+        <div class="panel-body">
+          ${translatedText
+            ? `<pre class="arabic">${escapeHtml(translatedText)}</pre>`
+            : `<div class="placeholder">Hit <strong style="color:#4b5563;margin:0 6px">Translate & Verify</strong> to generate</div>`}
+        </div>
+      </div>`;
+  }
+
+  function showReport(report) {
+    const color = report.includes("APPROVED") ? "#10b981"
+                : report.includes("REJECTED") ? "#ef4444" : "#f59e0b";
+    const label = report.includes("APPROVED") ? "✓ APPROVED"
+                : report.includes("REJECTED") ? "✗ REJECTED" : "⚠ NEEDS REVISION";
+
+    const btn = document.getElementById("verifyBtn");
+    btn.style.display = "inline";
+    btn.style.color = color;
+    btn.style.background = color + "11";
+    btn.style.border = `1px solid ${color}44`;
+    btn.textContent = label + " · View Report";
+
+    document.getElementById("reportDot").style.background = color;
+    document.getElementById("reportDot").style.boxShadow = `0 0 8px ${color}`;
+    document.getElementById("reportBody").textContent = report;
+  }
+
+  function toggleReport() {
+    const panel = document.getElementById("reportPanel");
+    const btn = document.getElementById("verifyBtn");
+    const showing = panel.style.display === "block";
+    panel.style.display = showing ? "none" : "block";
+    btn.textContent = btn.textContent.replace(showing ? "Hide" : "View", showing ? "View" : "Hide");
+  }
+
+  function showStatus(msg) {
+    document.getElementById("statusMsg").textContent = msg;
+    document.getElementById("status").style.display = "flex";
+  }
+  function hideStatus() { document.getElementById("status").style.display = "none"; }
+  function activateTranslateBtn() { document.getElementById("translateBtn").classList.add("active"); }
+  function escapeHtml(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+</script>
+</body>
+</html>
