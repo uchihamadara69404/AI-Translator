@@ -183,6 +183,7 @@
   <input type="file" id="fileInput" accept=".pdf" style="display:none" />
   <button id="uploadBtn" onclick="document.getElementById('fileInput').click()">↑ Upload PDF</button>
   <button id="translateBtn" onclick="runTranslate()">⟳ Translate & Verify</button>
+  <button id="clearBtn" onclick="clearAll()" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#6b7280;">✕ Clear</button>
   <span class="filename" id="filename" style="display:none"></span>
   <div class="status" id="status" style="display:none">
     <div class="spinner"></div>
@@ -336,6 +337,30 @@
   function hideStatus() { document.getElementById("status").style.display = "none"; }
   function activateTranslateBtn() { document.getElementById("translateBtn").classList.add("active"); }
   function escapeHtml(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function clearAll() {
+  originalText = "";
+  translatedText = "";
+  document.getElementById("filename").style.display = "none";
+  document.getElementById("filename").textContent = "";
+  document.getElementById("verifyBtn").style.display = "none";
+  document.getElementById("reportPanel").style.display = "none";
+  document.getElementById("reportBody").textContent = "";
+  document.getElementById("translateBtn").classList.remove("active");
+  document.getElementById("fileInput").value = "";
+  panels.innerHTML = `
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="drop-icon">📄</div>
+      <div class="drop-title">Upload a PDF to begin</div>
+      <div class="drop-sub">Drag & drop or click to browse<br>English → Arabic with dual-layer verification</div>
+    </div>`;
+  // re-attach drag events to the new dropZone
+  const dz = document.getElementById("dropZone");
+  dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("drag"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("drag"));
+  dz.addEventListener("drop", (e) => { e.preventDefault(); dz.classList.remove("drag"); if (e.dataTransfer.files[0]) handleUpload(e.dataTransfer.files[0]); });
+}
+
 </script>
 </body>
 </html>
