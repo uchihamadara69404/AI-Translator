@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Tarjama · ترجمة
 
 An AI-powered web application that translates official English PDF documents into Arabic with full formatting preservation and independent dual-layer verification.
