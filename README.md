@@ -1,7 +1,8 @@
+<<<<<<< HEAD
 # Tarjama · ترجمة
 
 An AI-powered web application that translates official English PDF documents into Arabic with full formatting preservation and independent dual-layer verification.
-
+=======
 Built for use cases involving sensitive, legal, or governmental content where translation accuracy is non-negotiable. Tarjama does not simply translate text — it runs a second independent AI verification pass that audits the translation and returns a structured accuracy report with a final verdict of **APPROVED**, **NEEDS REVISION**, or **REJECTED**.
 
 ---
@@ -195,5 +196,78 @@ AI-Translator/
 
 ## Security
 
+<<<<<<< HEAD
 - Never share or commit your `.env` file
 - The app has no authentication — do not expose it to the public internet without adding auth
+=======
+
+Setup and Installation
+There are two ways to run this application — using Docker (recommended for reviewers and non-developers) or running it directly with Python.
+
+Option 1 — Docker (Recommended for reviewers)
+This is the easiest option. You do not need Python, pip, or any development tools installed. You only need Docker Desktop and a Groq API key.
+Step 1 — Install Docker Desktop
+Download and install from docker.com. Once installed, make sure it is running before proceeding.
+Step 2 — Get a free Groq API key
+Go to console.groq.com, sign up for a free account, and generate an API key. No credit card is required.
+Step 3 — Clone the repository
+
+git clone https://github.com/uchihamadara69404/AI-Translator.git
+cd AI-Translator
+
+
+Step 4 — Create your environment file
+In the project folder, create a file called .env and add the following line:
+
+GROQ_API_KEY=your-groq-api-key-here
+
+
+Replace your-groq-api-key-here with the key you generated in Step 2. A template file called .env.example is included in the repo for reference.
+Step 5 — Run the application
+
+docker-compose up
+
+
+Step 6 — Open the app
+Go to http://localhost:5000 in your browser. The application is ready to use.
+To stop the application, press Ctrl+C in the terminal.
+
+Option 2 — Run Locally with Python
+Use this option if you have Python installed and prefer not to use Docker.
+Step 1 — Get a free Groq API key
+Go to console.groq.com, sign up, and generate an API key. No credit card is required.
+Step 2 — Clone the repository
+
+git clone https://github.com/uchihamadara69404/AI-Translator.git
+cd AI-Translator
+
+
+Step 3 — Install dependencies
+
+pip install flask pdfplumber groq
+
+
+Step 4 — Set your API key
+
+export GROQ_API_KEY="your-groq-api-key-here"
+
+
+Step 5 — Run the application
+
+python app.py
+
+
+Step 6 — Open the app
+Go to http://127.0.0.1:5000 in your browser.
+
+Option 3 — GitHub Codespaces (For developers)
+Step 1 — Add your Groq API key as a Codespace secret
+Go to GitHub → Settings → Codespaces → Secrets and add GROQ_API_KEY. It will be automatically injected into every Codespace session.
+Step 2 — Open the repo in Codespaces and run
+
+pip install flask pdfplumber groq
+python app.py
+
+
+A popup will appear to open the forwarded port directly in your browser.
+>>>>>>> ea2499e (Update: ReadME file)
