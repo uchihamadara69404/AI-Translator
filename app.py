@@ -1,3 +1,9 @@
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from flask import Flask, request, jsonify, send_from_directory
 import pdfplumber
 import groq
@@ -6,7 +12,10 @@ import io
 import json
 
 app = Flask(__name__)
-client = groq.Groq(api_key=os.environ["GROQ_API_KEY"])
+api_key = os.environ.get("GROQ_API_KEY", "")
+if not api_key:
+    print("WARNING: GROQ_API_KEY not set — translation will fail")
+client = groq.Groq(api_key=api_key)
 MODEL = "llama-3.3-70b-versatile"
 
 def chat(system, user):
@@ -87,4 +96,4 @@ Provide a structured report covering:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=False)
